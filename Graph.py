@@ -1,17 +1,23 @@
 from collections import defaultdict
 from Node import DNode
 
-# a class that represents a discreet graph 
-# using a dictionary with nodes as keys and
-# adjacent nodes as a list of items attached to the 
-# keys
+
 class Graph(object):
+  """a class that represents a discreet graph using a dictionary with nodes
+     as keys and adjacent nodes as a list of items attached to the keys.
+
+     Attributes:
+      _graph (dict(set)): keys in the dictionary are the individual nodes
+                          values in the set are AdjNodes
+    
+  """
   def __init__(self):
     self._graph = defaultdict(set)
 
-  # updates a node with the most current information
-  # checks if a node needs to be removed
   def update(self, node, aNodes):
+    """updates a node with the most current information
+       checks if a node needs to be removed
+    """
     try:
       del self._graph[node]
     except:
@@ -21,26 +27,29 @@ class Graph(object):
         self.removeNode(aNode.name)
       self._graph[node].add(aNode)
 
-  # removes all references to a node from the graph
   def removeNode(self, node):
+    """removes all references to a node from the graph"""
     justRemoved = self._graph.pop(node, None)
     if justRemoved:
       for n, aNodes in self._graph.items():
         aNodes = [a for a in aNodes if a.name != node]
-      # print("Removed {} from graph".format(node))
 
-  # print out the paths and their costs to all other nodes 
-  # in the graph from the start node
   def printAllPaths(self, startN):
-      nodes = self.calcLeastCostPaths(startN)
-      for n in nodes:
-        if n.name == startN:
-          continue
-        path = self.getPathStr(nodes, n)
-        print("least-cost path to node {!s}: {!s} and the cost is {:.1f}".format(n.name, path, n.dist))
+    """print out the paths and their costs to all other nodes in the graph from
+      the start node
+    """
+    nodes = self.calcLeastCostPaths(startN)
+    for n in nodes:
+      if n.name == startN:
+        continue
+      path = self.getPathStr(nodes, n)
+      print("least-cost path to node {!s}: {!s}".format(n.name, path)
+            + "and the cost is {:.1f}".format(n.dist))
 
-  # calculates the cost of all paths to nodes in the graph from the start node
   def calcLeastCostPaths(self, startN):
+    """calculates the cost of all paths to nodes in the graph
+       from the start node
+    """
     nodes = []
     for n in self._graph.keys():
       dN = DNode(n)
@@ -67,9 +76,10 @@ class Graph(object):
 
     return nodes
 
-  # gets the string representation of the least-cost path 
-  # that needs to be taken  
   def getPathStr(self, nodes, end):
+    """ gets the string representation of the least-cost path 
+        that needs to be taken 
+    """ 
     pathStr = ""
     n = end
     while not n == None:

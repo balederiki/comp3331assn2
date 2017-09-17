@@ -1,7 +1,11 @@
 COMP3331 Assignment 2
 James Nicol
 
+==========================================
 Python 3 should be used to execute Lsr.py
+usage
+$./startNetwork.sh
+==========================================
 
 Discussion of features
 Features implemented

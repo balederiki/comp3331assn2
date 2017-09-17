@@ -1,12 +1,12 @@
 #!/usr/bin/python3
-import sys, socket, threading, time, pickle
+import sys
+import socket
+import threading
+import time
+import pickle
 from threading import Thread
 from Node import AdjNode
 from Graph import Graph
-# reference numbers
-N_NAME = 0
-N_COST = 1
-N_PORT = 2
 
 # constants
 ROUTE_UPDATE_INTERVAL = 5 
@@ -58,38 +58,41 @@ def main():
     # check if it is time to recalculate the graph and 
     # print the statistics about it
     if time.time() > refT + ROUTE_UPDATE_INTERVAL:
+      print("="*51)
       refT = time.time()
       network.printAllPaths(nodeName)
 
-
-# removes a node from both the adjacent nodes list
-# and this nodes picture of the network
 def removeNode(node, aNodes, network, aLock):
-  aLock.acquire()
+  """removes a node from both the adjacent nodes list
+     and this nodes picture of the network  aLock.acquire()
+  """
   aNode = next(n for n in aNodes if n.name == node)
   aNode.alive = False
   aLock.release()
 
   network.removeNode(node)
 
-# exctract a list of adjacent nodes from the text 
-# file that is given
 def getNodesFromFile(file):
+  """exctract a list of adjacent nodes from the text 
+     file that is given
+  """
+
   fh = open(file, encoding='ascii', newline="")
   fLines = fh.readlines()
   numNodes = int(fLines.pop(0))
   adjNodes = []
   for x in range(numNodes):
-    words = fLines[x].split()
-    n = AdjNode(words[N_NAME], float(words[N_COST]), int(words[N_PORT]))
+    name, cost, port = fLines[x].split()
+    n = AdjNode(name, float(cost), int(port))
     adjNodes.append(n)
   return adjNodes
 
-# checks if there are any packets to be read, checks the type of packet and 
-# floods the message if it is an update or take note of the time of a heartbeat
-# if it misses 3 heartbeats it will indicate this by returning 'None' in the second 
-# field of the tuple and the node that it missed it from in the first
 def recvFromAll(sock, adjNodes):
+  """checks if there are any packets to be read, checks the type of packet and 
+     floods the message if it is an update or take note of the time of a heartbeat
+     if it misses 3 heartbeats it will indicate this by returning 'None' in the second 
+     field of the tuple and the node that it missed it from in the first
+  """
   sock.setblocking(0)
   try:
     data, addr = sock.recvfrom(1024)
@@ -140,7 +143,6 @@ def recvFromAll(sock, adjNodes):
 recvFromAll.lUtime = []
 recvFromAll.lHBtime = []
 
-# thread to send the heartbeat and update
 class UpdateThread(Thread):
   def __init__(self, sock, adjNodes, adjLock, name):
     Thread.__init__(self)
